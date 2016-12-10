@@ -37,8 +37,8 @@ struct ec_master {
     uint8_t *process_data; // 指向过程数据的指针
     size_t process_data_size; // 过程数据的大小
 
-    ec_domain_t *first_domain;
-    ec_slave_config_t *first_config;
+    ec_domain_t *first_domain; // 指向第一个 domain 的指针
+    ec_slave_config_t *first_config; // 指向第一个 slave config 的指针
 };
 
 /*****************************************************************************/

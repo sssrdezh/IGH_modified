@@ -69,16 +69,20 @@ void ec_master_clear_config(ec_master_t *master)
     ec_domain_t *d, *next_d;
     ec_slave_config_t *c, *next_c;
 
+    // 清除 master 的所有 domain
     d = master->first_domain;
-    while (d) {
+    while (d)
+    {
         next_d = d->next;
         ec_domain_clear(d);
         d = next_d;
     }
     master->first_domain = NULL;
 
+    // 清除 master 的所有 slave config
     c = master->first_config;
-    while (c) {
+    while (c)
+    {
         next_c = c->next;
         ec_slave_config_clear(c);
         c = next_c;
@@ -90,13 +94,21 @@ void ec_master_clear_config(ec_master_t *master)
 
 void ec_master_clear(ec_master_t *master)
 {
-    if (master->process_data)  {
+    // 如果 master 上有过程数据,进if{}.
+    if (master->process_data)
+    {
+        // 释放由mmap创建的内存空间
         munmap(master->process_data, master->process_data_size);
     }
 
+    // 清除 master 的 domain 和 slave config
     ec_master_clear_config(master);
 
-    if (master->fd != -1) {
+    // 如果文件描述符有效,进if{}.
+    // 若定义了 USE_RTDM ,则使用 rt_dev_close() 函数关闭 EtherCAT0,
+    // 若未定义 USE_RTDM,则使用 close() 函数关闭 /dev/EtherCAT0.
+    if (master->fd != -1)
+    {
 #if USE_RTDM
         rt_dev_close(master->fd);
 #else

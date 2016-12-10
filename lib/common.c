@@ -54,9 +54,14 @@ unsigned int ecrt_version_magic(void)
 
 ec_master_t *ecrt_request_master(unsigned int master_index)
 {
+    // 尝试打开一个 master.
     ec_master_t *master = ecrt_open_master(master_index);
-    if (master) {
-        if (ecrt_master_reserve(master) < 0) {
+    if (master) // 如果打开成功,进if{}.
+    {
+        // 预定一个 master,如果返回值 <0,说明失败,进if{}.
+        if (ecrt_master_reserve(master) < 0)
+        {
+            // 清除 master
             ec_master_clear(master);
             free(master);
             master = NULL;
@@ -90,8 +95,8 @@ ec_master_t *ecrt_open_master(unsigned int master_index)
     // 初始化 master 结构体
     master->process_data = NULL; // 指向过程数据的指针地址
     master->process_data_size = 0; // 过程数据的大小
-    master->first_domain = NULL; // 指向第一个域的指针地址
-    master->first_config = NULL;
+    master->first_domain = NULL; // 指向第一个 domain 的指针地址
+    master->first_config = NULL; // 指向第一个 slave config 的指针地址
 
     // snprintf() 函数包含在stdio.h 中.
     // 这里我们假设 master_index 的值为0,

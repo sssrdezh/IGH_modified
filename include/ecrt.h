@@ -548,20 +548,18 @@ extern "C" {
  */
 unsigned int ecrt_version_magic(void);
 
-/** Requests an EtherCAT master for realtime operation.
+/** 为实时运行请求一个EtherCAT主站.
  *
- * Before an application can access an EtherCAT master, it has to reserve one
- * for exclusive use.
+ * 在一个应用程序可以访问EtherCAT主站之前,它必须要先预定一个主站用于独占使用.
  *
- * In userspace, this is a convenience function for ecrt_open_master() and
- * ecrt_master_reserve().
+ * 在用户空间中,这是一个调用了 ecrt_open_master() 和 ecrt_master_reserve()
+ * 的方便的函数.
  *
- * This function has to be the first function an application has to call to
- * use EtherCAT. The function takes the index of the master as its argument.
- * The first master has index 0, the n-th master has index n - 1. The number
- * of masters has to be specified when loading the master module.
+ * 这个函数必须作为一个应用程序使用EtherCAT时首先调用的函数.
+ * 该函数将主站的索引号作为其参数.第一个主站的索引号为0,第n个主站的索引号为n-1.
+ * 在加载主站模块的时候必须指定主站的数量.
  *
- * \return Pointer to the reserved master, otherwise \a NULL.
+ * \返回 指向预定主站的指针,否则为NULL.
  */
 ec_master_t *ecrt_request_master(
         unsigned int master_index /**< Index of the master to request. */
@@ -569,16 +567,15 @@ ec_master_t *ecrt_request_master(
 
 #ifndef __KERNEL__
 
-/** Opens an EtherCAT master for userspace access.
+/** 为用户空间访问打开一个EtherCAT主站.
  *
- * This function has to be the first function an application has to call to
- * use EtherCAT. The function takes the index of the master as its argument.
- * The first master has index 0, the n-th master has index n - 1. The number
- * of masters has to be specified when loading the master module.
+ * 这个函数必须作为一个应用程序使用EtherCAT时首先调用的函数.
+ * 该函数将主站的索引号作为其参数.第一个主站的索引号为0,第n个主站的索引号为n-1.
+ * 在加载主站模块的时候必须指定主站的数量.
  *
- * For convenience, the function ecrt_request_master() can be used.
+ * 为了方便,可以使用 ecrt_request_master() 函数.
  *
- * \return Pointer to the opened master, otherwise \a NULL.
+ * \返回 指向打开的主站的指针,否则为NULL.
  */
 ec_master_t *ecrt_open_master(
         unsigned int master_index /**< Index of the master to request. */
@@ -586,32 +583,30 @@ ec_master_t *ecrt_open_master(
 
 #endif // #ifndef __KERNEL__
 
-/** Releases a requested EtherCAT master.
+/** 释放一个请求到的EtherCAT主站.
  *
- * After use, a master it has to be released to make it available for other
- * applications.
+ * 在主站使用结束后,必须要释放它,以便其他应用程序使用该主站.
  *
- * This method frees all created data structures. It should not be called in
- * realtime context.
+ * 这个方法释放所有创建的数据结构体.必须在实时上下文中调用它.
  *
- * If the master was activated, ecrt_master_deactivate() is called internally.
+ * 如果主站被激活了, 要在内部调用 ecrt_master_deactivate().
  */
 void ecrt_release_master(
         ec_master_t *master /**< EtherCAT master */
         );
 
 /******************************************************************************
- * Master methods
+ * 主站方法
  *****************************************************************************/
 
 #ifndef __KERNEL__
 
-/** Reserves an EtherCAT master for realtime operation.
+/** 为实时运行预定一个EtherCAT主站.
  *
- * Before an application can use PDO/domain registration functions or SDO
- * request functions on the master, it has to reserve one for exclusive use.
+ * 在一个应用程序可以在主站上使用 PDO/域 注册或 SDO请求函数之前,
+ * 它必须要预定一个主站来独占使用.
  *
- * \return 0 in case of success, else < 0
+ * \返回 0 表示成功, 否则返回值 < 0
  */
 int ecrt_master_reserve(
         ec_master_t *master /**< EtherCAT master */
