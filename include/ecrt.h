@@ -131,169 +131,171 @@
 #endif
 
 /******************************************************************************
- * Global definitions
+ * 全局定义
  *****************************************************************************/
 
-/** EtherCAT realtime interface major version number.
+/** EtherCAT 实时接口主版本号.
  */
 #define ECRT_VER_MAJOR 1
 
-/** EtherCAT realtime interface minor version number.
+/** EtherCAT 实时接口次版本号.
  */
 #define ECRT_VER_MINOR 5
 
-/** EtherCAT realtime interface version word generator.
+/** EtherCAT 实时接口版本字生成器.
  */
 #define ECRT_VERSION(a, b) (((a) << 8) + (b))
 
-/** EtherCAT realtime interface version word.
+/** EtherCAT 实时接口版本字.
  */
 #define ECRT_VERSION_MAGIC ECRT_VERSION(ECRT_VER_MAJOR, ECRT_VER_MINOR)
 
 /******************************************************************************
- * Feature flags
+ * 功能标志
  *****************************************************************************/
 
-/** Defined, if the redundancy features are available.
+/** 定义冗余功能是否有效.
  *
- * I. e. if the \a redundancy_active flag in ec_domain_state_t and the
- * ecrt_master_link_state() method are available.
+ * 即,ec_domain_state_t和ecrt_master_link_state()方法中的
+ * redundancy_active标志是否有效
  */
 #define EC_HAVE_REDUNDANCY
 
-/** Defined, if the CoE emergency ring feature is available.
+/** 定义CoE紧急环功能是否有效.
  *
- * I. e. if the ecrt_slave_config_emerg_*() methods are available.
+ * 即,ecrt_slave_config_emerg_*()方法是否有效.
  */
 #define EC_HAVE_EMERGENCY
 
-/** Defined, if the register access interface is available.
+/** 定义寄存器访问接口是否有效.
  *
- * I. e. if the methods ecrt_slave_config_create_reg_request(),
- * ecrt_reg_request_data(), ecrt_reg_request_state(), ecrt_reg_request_write()
- * and ecrt_reg_request_read() are available.
+ * 即,主站的 ecrt_slave_config_create_reg_request(),ecrt_reg_request_data(),
+ * ecrt_reg_request_state(), ecrt_reg_request_write(), ecrt_reg_request_read()
+ * 是否有效.
  */
 #define EC_HAVE_REG_ACCESS
 
-/** Defined if the method ecrt_master_select_reference_clock() is available.
+/** 定义选择分布式时钟功能是否有效.
+ *
+ * 即, ecrt_master_select_reference_clock() 方法是否有效.
  */
 #define EC_HAVE_SELECT_REF_CLOCK
 
-/** Defined if the method ecrt_master_reference_clock_time() is available.
+/** 定义参考时钟功能是否有效.
+ *
+ * 即, ecrt_master_reference_clock_time() 方法是否有效.
  */
 #define EC_HAVE_REF_CLOCK_TIME
 
-/** Defined if the method ecrt_slave_config_reg_pdo_entry_pos() is available.
+/** 定义配置从站寄存器PDO功能是否有效.
+ *
+ * 即, ecrt_slave_config_reg_pdo_entry_pos() 方法是否有效.
  */
 #define EC_HAVE_REG_BY_POS
 
 /*****************************************************************************/
 
-/** End of list marker.
+/** 列表的结束标志
  *
- * This can be used with ecrt_slave_config_pdos().
+ * 在 ecrt_slave_config_pdos() 方法中使用.
  */
 #define EC_END ~0U
 
-/** Maximum number of sync managers per slave.
+/** 每个从站的同步管理器的最大数量.
  */
 #define EC_MAX_SYNC_MANAGERS 16
 
-/** Maximum string length.
+/** 字符串的最大长度.
  *
- * Used in ec_slave_info_t.
+ * 在 ec_slave_info_t 中使用.
  */
 #define EC_MAX_STRING_LENGTH 64
 
-/** Maximum number of slave ports. */
+/** 从站端口的最大数量.
+ */
 #define EC_MAX_PORTS 4
 
-/** Timeval to nanoseconds conversion.
+/** 将timeval 转换为 nanoseconds.
  *
- * This macro converts a Unix epoch time to EtherCAT DC time.
+ * 该宏将Unix新纪元时间(Unix epoch time)转换为 EtherCAT 的 DC 时间.
  *
- * \see void ecrt_master_application_time()
+ * \见 void ecrt_master_application_time()
  *
- * \param TV struct timeval containing epoch time.
+ * \参数 TV 结构体存放新纪元时间.
  */
 #define EC_TIMEVAL2NANO(TV) \
     (((TV).tv_sec - 946684800ULL) * 1000000000ULL + (TV).tv_usec * 1000ULL)
 
-/** Size of a CoE emergency message in byte.
- *
- * \see ecrt_slave_config_emerg_pop().
- */
+    /** CoE 紧急消息的大小,单位字节.
+     *
+     * \见 ecrt_slave_config_emerg_pop().
+     */
 #define EC_COE_EMERGENCY_MSG_SIZE 8
 
 /******************************************************************************
- * Data types
+ * 数据类型
  *****************************************************************************/
 
 struct ec_master;
-typedef struct ec_master ec_master_t; /**< \see ec_master */
+typedef struct ec_master ec_master_t; /**< \见 ec_master */
 
 struct ec_slave_config;
-typedef struct ec_slave_config ec_slave_config_t; /**< \see ec_slave_config */
+typedef struct ec_slave_config ec_slave_config_t; /**< \见 ec_slave_config */
 
 struct ec_domain;
-typedef struct ec_domain ec_domain_t; /**< \see ec_domain */
+typedef struct ec_domain ec_domain_t; /**< \见 ec_domain */
 
 struct ec_sdo_request;
-typedef struct ec_sdo_request ec_sdo_request_t; /**< \see ec_sdo_request. */
+typedef struct ec_sdo_request ec_sdo_request_t; /**< \见 ec_sdo_request. */
 
 struct ec_voe_handler;
-typedef struct ec_voe_handler ec_voe_handler_t; /**< \see ec_voe_handler. */
+typedef struct ec_voe_handler ec_voe_handler_t; /**< \见 ec_voe_handler. */
 
 struct ec_reg_request;
-typedef struct ec_reg_request ec_reg_request_t; /**< \see ec_sdo_request. */
+typedef struct ec_reg_request ec_reg_request_t; /**< \见 ec_sdo_request. */
 
 /*****************************************************************************/
 
-/** Master state.
+/** 主站状态.
  *
- * This is used for the output parameter of ecrt_master_state().
+ * 这是 ecrt_master_state() 的一个输出参数.
  *
- * \see ecrt_master_state().
+ * \见 ecrt_master_state().
  */
 typedef struct {
-    unsigned int slaves_responding; /**< Sum of responding slaves on all
-                                      Ethernet devices. */
-    unsigned int al_states : 4; /**< Application-layer states of all slaves.
-                                  The states are coded in the lower 4 bits.
-                                  If a bit is set, it means that at least one
-                                  slave in the bus is in the corresponding
-                                  state:
+    unsigned int slaves_responding; /**< 所有以太网设备上响应的从站总数. */
+    unsigned int al_states : 4; /**< 所有从站的应用程序层状态.
+                                  所有的状态都在低4位进行编码.
+                                  如果某一个位为1,说明总线上至少有一个从站处于
+                                  相应的状态:
                                   - Bit 0: \a INIT
                                   - Bit 1: \a PREOP
                                   - Bit 2: \a SAFEOP
                                   - Bit 3: \a OP */
-    unsigned int link_up : 1; /**< \a true, if at least one Ethernet link is
-                                up. */
+    unsigned int link_up : 1; /**< 如果至少有一个以太网链接建立,为真.*/
 } ec_master_state_t;
 
 /*****************************************************************************/
 
-/** Redundant link state.
+/** 冗余链接的状态.
  *
- * This is used for the output parameter of ecrt_master_link_state().
+ * 这是 ecrt_master_link_state() 的一个输出参数.
  *
- * \see ecrt_master_link_state().
+ * \见 ecrt_master_link_state().
  */
-typedef struct {
-    unsigned int slaves_responding; /**< Sum of responding slaves on the given
-                                      link. */
-    unsigned int al_states : 4; /**< Application-layer states of the slaves on
-                                  the given link.  The states are coded in the
-                                  lower 4 bits.  If a bit is set, it means
-                                  that at least one slave in the bus is in the
-                                  corresponding state:
-                                  - Bit 0: \a INIT
-                                  - Bit 1: \a PREOP
-                                  - Bit 2: \a SAFEOP
-                                  - Bit 3: \a OP */
-    unsigned int link_up : 1; /**< \a true, if the given Ethernet link is up.
-                               */
-} ec_master_link_state_t;
+ typedef struct {
+     unsigned int slaves_responding; /**< 给定链接上相应的从站总数. */
+     unsigned int al_states : 4; /**< 给定链接上从站的应用程序层状态.
+                                   所有的状态都在低4位进行编码.
+                                   如果某一个位为1,说明总线上至少有一个从站处于
+                                   相应的状态:
+                                   - Bit 0: \a INIT
+                                   - Bit 1: \a PREOP
+                                   - Bit 2: \a SAFEOP
+                                   - Bit 3: \a OP */
+     unsigned int link_up : 1; /**< 如果给定的以太网链接建立,为真.
+                                */
+ } ec_master_link_state_t;
 
 /*****************************************************************************/
 
@@ -540,9 +542,9 @@ typedef enum {
 extern "C" {
 #endif
 
-/** Returns the version magic of the realtime interface.
+/** 返回时实时接口的version magic.
  *
- * \return Value of ECRT_VERSION_MAGIC() at EtherCAT master compile time.
+  * \在EtherCAT主站编译时返回 ECRT_VERSION_MAGIC() 的值.
  */
 unsigned int ecrt_version_magic(void);
 

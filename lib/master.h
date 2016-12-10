@@ -33,9 +33,9 @@
 /*****************************************************************************/
 
 struct ec_master {
-    int fd;
-    uint8_t *process_data;
-    size_t process_data_size;
+    int fd; // file descriptor 主站的文件描述符
+    uint8_t *process_data; // 指向过程数据的指针
+    size_t process_data_size; // 过程数据的大小
 
     ec_domain_t *first_domain;
     ec_slave_config_t *first_config;

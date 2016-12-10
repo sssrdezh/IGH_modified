@@ -45,6 +45,8 @@
 
 unsigned int ecrt_version_magic(void)
 {
+    // #define ECRT_VERSION(a, b) (((a) << 8) + (b))
+    // #define ECRT_VERSION_MAGIC ECRT_VERSION(ECRT_VER_MAJOR, ECRT_VER_MINOR)
     return ECRT_VERSION_MAGIC;
 }
 
@@ -70,22 +72,31 @@ ec_master_t *ecrt_request_master(unsigned int master_index)
 
 ec_master_t *ecrt_open_master(unsigned int master_index)
 {
-    char path[MAX_PATH_LEN];
-    ec_master_t *master = NULL;
+    char path[MAX_PATH_LEN]; // 声明 master module 的路径.
+    ec_master_t *master = NULL; // 声明 master.
     ec_ioctl_module_t module_data;
-    int ret;
+    int ret; // 声明 ioctl 的返回值.
 
-    master = malloc(sizeof(ec_master_t));
-    if (!master) {
+    master = malloc(sizeof(ec_master_t)); // 为 master 分配内存空间.
+
+    // 如果分配内存空间失败,进if{}.
+    if (!master)
+    {
+        // 向 stderr 打印错误信息.
         fprintf(stderr, "Failed to allocate memory.\n");
         return 0;
     }
 
-    master->process_data = NULL;
-    master->process_data_size = 0;
-    master->first_domain = NULL;
+    // 初始化 master 结构体
+    master->process_data = NULL; // 指向过程数据的指针地址
+    master->process_data_size = 0; // 过程数据的大小
+    master->first_domain = NULL; // 指向第一个域的指针地址
     master->first_config = NULL;
 
+    // snprintf() 函数包含在stdio.h 中.
+    // 这里我们假设 master_index 的值为0,
+    // 若定义了 USE_RTDM, 则 path = "EtherCAT0\0",
+    // 若未定义 USE_RTDM, 则 path = "/dev/EtherCAT0\0".
     snprintf(path, MAX_PATH_LEN - 1,
 #ifdef USE_RTDM
             "EtherCAT%u",
@@ -94,25 +105,50 @@ ec_master_t *ecrt_open_master(unsigned int master_index)
 #endif
             master_index);
 
+    // open()函数需要 sys/types.h, sys/stat.h, fcntl.h
+    // 若定义了 USE_RTDM ,则使用 rt_dev_open() 函数打开 EtherCAT0,
+    // 若未定义 USE_RTDM,则使用 open() 函数打开 /dev/EtherCAT0.
+    // 可读可写
+    // 如果成功,则返回一个文件描述符, 失败则返回-1.
 #ifdef USE_RTDM
     master->fd = rt_dev_open(path, O_RDWR);
 #else
     master->fd = open(path, O_RDWR);
 #endif
-    if (EC_IOCTL_IS_ERROR(master->fd)) {
+
+    //检查open是否成功, 若fd为错误码,进 if{}.
+    if (EC_IOCTL_IS_ERROR(master->fd))
+    {
+        // 向 stderr 中打印错误信息.
         fprintf(stderr, "Failed to open %s: %s\n", path,
                 strerror(EC_IOCTL_ERRNO(master->fd)));
         goto out_clear;
     }
 
+    // ioctl是设备驱动程序中对设备的I/O通道进行管理的函数.
+    // #define EC_IOCTL_MODULE  EC_IOR(0x00, ec_ioctl_module_t)
+    // #define EC_IOR(nr, type)   _IOR(EC_IOCTL_TYPE, nr, type)
+    // #define EC_IOCTL_TYPE 0xa4
+    // ret = ioctl(master->fd, _IOR(0xa4, 0x00, ec_ioctl_module_t), &module_data)
+    // _IOR用于创建从设备读取数据的命令.
     ret = ioctl(master->fd, EC_IOCTL_MODULE, &module_data);
-    if (EC_IOCTL_IS_ERROR(ret)) {
+
+    // 检查 ioctl 是否成功, 若 ret 错误,进if()
+    if (EC_IOCTL_IS_ERROR(ret))
+    {
+        // 向 stderr 中打印错误信息.
         fprintf(stderr, "Failed to get module information from %s: %s\n",
                 path, strerror(EC_IOCTL_ERRNO(ret)));
         goto out_clear;
     }
 
-    if (module_data.ioctl_version_magic != EC_IOCTL_VERSION_MAGIC) {
+    // 若 ioctl 成功,则数据传回 module_data
+    // 检查 version magic
+    // #define EC_IOCTL_VERSION_MAGIC 27 (master/ioctl.h)
+    // 如果 version magic 不相等,进if()
+    if (module_data.ioctl_version_magic != EC_IOCTL_VERSION_MAGIC)
+    {
+        // 向 stderr 中打印错误信息.
         fprintf(stderr, "ioctl() version magic is differing:"
                 " %s: %u, libethercat: %u.\n",
                 path, module_data.ioctl_version_magic,

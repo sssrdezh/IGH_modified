@@ -44,8 +44,17 @@
 
 int ecrt_master_reserve(ec_master_t *master)
 {
+    //#define EC_IOCTL_REQUEST  EC_IO(0x1e)
+    //#define EC_IO(nr) _IO(EC_IOCTL_TYPE, 0x1e)
+    //#define EC_IOCTL_TYPE 0xa4
+    // int ret = ioctl(master->fd, _IO(0xa4, 0x1e), NULL);
+    //_IO没有可传送的变量，只是用于传送命令.
     int ret = ioctl(master->fd, EC_IOCTL_REQUEST, NULL);
-    if (EC_IOCTL_IS_ERROR(ret)) {
+
+    // 检查 ioctl 是否成功, 若 ret 错误,进if().
+    if (EC_IOCTL_IS_ERROR(ret))
+    {
+        // 向 stderr 中打印错误信息.
         fprintf(stderr, "Failed to reserve master: %s\n",
                 strerror(EC_IOCTL_ERRNO(ret)));
         return -EC_IOCTL_ERRNO(ret);
