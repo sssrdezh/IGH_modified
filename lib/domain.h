@@ -33,10 +33,10 @@
 /*****************************************************************************/
 
 struct ec_domain {
-    ec_domain_t *next;
-    unsigned int index;
-    ec_master_t *master;
-    uint8_t *process_data;
+    ec_domain_t *next; // 下一个 domain 的地址
+    unsigned int index; // domain 的索引号
+    ec_master_t *master; // domain 对应的 master
+    uint8_t *process_data; // 过程数据
 };
 
 /*****************************************************************************/

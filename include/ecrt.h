@@ -535,7 +535,7 @@ typedef enum {
 } ec_al_state_t;
 
 /******************************************************************************
- * Global functions
+ * 全局函数
  *****************************************************************************/
 
 #ifdef __cplusplus
@@ -643,17 +643,15 @@ void ecrt_master_callbacks(
 
 #endif /* __KERNEL__ */
 
-/** Creates a new process data domain.
+/** 创建一个新的过程数据 domain.
  *
- * For process data exchange, at least one process data domain is needed.
- * This method creates a new process data domain and returns a pointer to the
- * new domain object. This object can be used for registering PDOs and
- * exchanging them in cyclic operation.
+ * 要进行过程数据交换,至少需要一个过程数据 domain.
+ * 该方法创建一个新的过程数据 domain,并返回一个指向这个新的 domain 对象的指针.
+ * 这个指针可以用来在循环操作中注册 PDO,并进行交换.
  *
- * This method allocates memory and should be called in non-realtime context
- * before ecrt_master_activate().
+ * 这个方法分配了内存,而且应当在非实时上下文中,在 ecrt_master_activate() 之前调用.
  *
- * \return Pointer to the new domain on success, else NULL.
+ * \返回 如果成功,返回指向新的 domain 的指针,否则返回 NULL.
  */
 ec_domain_t *ecrt_master_create_domain(
         ec_master_t *master /**< EtherCAT master. */

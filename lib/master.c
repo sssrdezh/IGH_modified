@@ -121,13 +121,18 @@ void ec_master_clear(ec_master_t *master)
 
 void ec_master_add_domain(ec_master_t *master, ec_domain_t *domain)
 {
-    if (master->first_domain) {
+    // 如果不是 master 的第一个 domain,进if{}.
+    if (master->first_domain)
+    {
         ec_domain_t *d = master->first_domain;
         while (d->next) {
             d = d->next;
         }
         d->next = domain;
-    } else {
+    }
+    // 否则将该 domain 设为 master 的第一个 domain.
+    else
+    {
         master->first_domain = domain;
     }
 }
@@ -139,25 +144,40 @@ ec_domain_t *ecrt_master_create_domain(ec_master_t *master)
     ec_domain_t *domain;
     int index;
 
+    // 为 domain 分配内存空间
     domain = malloc(sizeof(ec_domain_t));
-    if (!domain) {
+    // 如果分配内存失败,进if{}.
+    if (!domain)
+    {
+        // 向 stderr 打印错误消息.
         fprintf(stderr, "Failed to allocate memory.\n");
         return 0;
     }
 
+    // ioctl是设备驱动程序中对设备的I/O通道进行管理的函数.
+    // #define EC_IOCTL_CREATE_DOMAIN EC_IO(0x1f)
+    // #define EC_IO(nr)  _IO(0xa4, 0x1f)
+    //#define EC_IOCTL_TYPE 0xa4
+    // index = ioctl(master->fd, _IO(0xa4, 0x1f), NULL);
+    // _IO没有可传送的变量，只是用于传送命令.
     index = ioctl(master->fd, EC_IOCTL_CREATE_DOMAIN, NULL);
-    if (EC_IOCTL_IS_ERROR(index)) {
+    // 如果创建 domain 失败,进if{}.
+    if (EC_IOCTL_IS_ERROR(index))
+    {
+        // 向 stderr 打印错误消息及错误码.
         fprintf(stderr, "Failed to create domain: %s\n",
                 strerror(EC_IOCTL_ERRNO(index)));
+        // 释放分配给 domain 的内存空间
         free(domain);
         return 0;
     }
-
+    // 初始化 domain 对象
     domain->next = NULL;
     domain->index = (unsigned int) index;
     domain->master = master;
     domain->process_data = NULL;
 
+    // 将 domain 添加到 master
     ec_master_add_domain(master, domain);
 
     return domain;
