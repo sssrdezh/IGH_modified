@@ -657,51 +657,44 @@ ec_domain_t *ecrt_master_create_domain(
         ec_master_t *master /**< EtherCAT master. */
         );
 
-/** Obtains a slave configuration.
+/** 获得一个 slave configuration.
  *
- * Creates a slave configuration object for the given \a alias and \a position
- * tuple and returns it. If a configuration with the same \a alias and \a
- * position already exists, it will be re-used. In the latter case, the given
- * vendor ID and product code are compared to the stored ones. On mismatch, an
- * error message is raised and the function returns \a NULL.
+ * 为给定的 alias 和 position 元组创建一个 slave configuration 对象.
+ * 如果已经存在一个带有相同 laias 和 position 的 configuration,
+ * 则继续使用那个 configuration. 在后面一种情况下,将对给定的 vendor ID 和
+ * product code 与现存的进行比较.如果不匹配,将产生错误信息并返回NULL.
  *
- * Slaves are addressed with the \a alias and \a position parameters.
- * - If \a alias is zero, \a position is interpreted as the desired slave's
- *   ring position.
- * - If \a alias is non-zero, it matches a slave with the given alias. In this
- *   case, \a position is interpreted as ring offset, starting from the
- *   aliased slave, so a position of zero means the aliased slave itself and a
- *   positive value matches the n-th slave behind the aliased one.
+ * 根据 alias 和 position 参数对 slave 进行编址.
+ * - 如果 alias 为 0, position 将被翻译为期待的 slave 的环位置.
+ * - 如果 alias 不为 0, 它将匹配到具有给定 alias 的 slave .这种情况下, position 将
+ *   被翻译为以alias开始的环偏移量,因此 position 为 0,指的是 alias 本身对应的slave,
+ *   position 的值对应的是alias后面的第 n 个 slave.
  *
- * If the slave with the given address is found during the bus configuration,
- * its vendor ID and product code are matched against the given value. On
- * mismatch, the slave is not configured and an error message is raised.
+ * 如果在总线配置时找到了具有给定 address 的 slave, 将对其 vendor ID 和 product code
+ * 与给定的值进行匹配.如果匹配不上,将不会对该 slave 进行配置,并产生一个错误信息.
  *
- * If different slave configurations are pointing to the same slave during bus
- * configuration, a warning is raised and only the first configuration is
- * applied.
+ * 如果在总线配置时有不同的 slave configuration 指向同一个 slave,将产生一个警告,
+ * 并且只会应用第一个 configuration .
  *
- * This method allocates memory and should be called in non-realtime context
- * before ecrt_master_activate().
+ * 这个方法分配了内存,而且应当在非实时上下文中,在 ecrt_master_activate() 之前调用.
  *
- * \retval >0 Pointer to the slave configuration structure.
- * \retval NULL in the error case.
+ * \返回值 >0 指向 slave configuration 的指针.
+ * \返回值 错误情况下为 NULL .
  */
 ec_slave_config_t *ecrt_master_slave_config(
         ec_master_t *master, /**< EtherCAT master */
         uint16_t alias, /**< Slave alias. */
         uint16_t position, /**< Slave position. */
-        uint32_t vendor_id, /**< Expected vendor ID. */
-        uint32_t product_code /**< Expected product code. */
+        uint32_t vendor_id, /**< 期望的 vendor ID. */
+        uint32_t product_code /**< 期望的 product code. */
         );
 
-/** Selects the reference clock for distributed clocks.
+/** 为分布式时钟选择参考时钟.
  *
- * If this method is not called for a certain master, or if the slave
- * configuration pointer is NULL, then the first slave with DC functionality
- * will provide the reference clock.
+ * 如果一个master没有调用这个函数,或者slave configuration指针为NULL,
+ * 那么第一个具有分布式时钟功能的slave将提供参考时钟.
  *
- * \return 0 on success, otherwise negative error code.
+ * \返回 0 表示成功,否则返回负的错误码.
  */
 int ecrt_master_select_reference_clock(
         ec_master_t *master, /**< EtherCAT master. */

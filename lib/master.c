@@ -124,6 +124,7 @@ void ec_master_add_domain(ec_master_t *master, ec_domain_t *domain)
     // 如果不是 master 的第一个 domain,进if{}.
     if (master->first_domain)
     {
+        // 将该 domain 添加到 domain 列表的末端.
         ec_domain_t *d = master->first_domain;
         while (d->next) {
             d = d->next;
@@ -156,8 +157,8 @@ ec_domain_t *ecrt_master_create_domain(ec_master_t *master)
 
     // ioctl是设备驱动程序中对设备的I/O通道进行管理的函数.
     // #define EC_IOCTL_CREATE_DOMAIN EC_IO(0x1f)
-    // #define EC_IO(nr)  _IO(0xa4, 0x1f)
-    //#define EC_IOCTL_TYPE 0xa4
+    // #define EC_IO(nr)  _IO(EC_IOCTL_TYPE, nr)
+    // #define EC_IOCTL_TYPE 0xa4
     // index = ioctl(master->fd, _IO(0xa4, 0x1f), NULL);
     // _IO没有可传送的变量，只是用于传送命令.
     index = ioctl(master->fd, EC_IOCTL_CREATE_DOMAIN, NULL);
@@ -187,13 +188,19 @@ ec_domain_t *ecrt_master_create_domain(ec_master_t *master)
 
 void ec_master_add_slave_config(ec_master_t *master, ec_slave_config_t *sc)
 {
-    if (master->first_config) {
+    // 如果不是 master 的第一个 slave configuration,进if{}.
+    if (master->first_config)
+    {
+        // 将该 slave configuration 添加 slave configuration 链表的末端.
         ec_slave_config_t *c = master->first_config;
         while (c->next) {
             c = c->next;
         }
         c->next = sc;
-    } else {
+    }
+    // 否则将该 slave configuration 设为 master 的第一个 slave configuration.
+    else
+    {
         master->first_config = sc;
     }
 }
@@ -208,34 +215,51 @@ ec_slave_config_t *ecrt_master_slave_config(ec_master_t *master,
     ec_slave_config_t *sc;
     int ret;
 
+    // 为 slave configuration 分配内存空间.
     sc = malloc(sizeof(ec_slave_config_t));
-    if (!sc) {
+    // 分配空间失败,进if{}.
+    if (!sc)
+    {
+        // 向 stderr 打印错误信息.
         fprintf(stderr, "Failed to allocate memory.\n");
         return 0;
     }
 
+    // 初始化 slave configuration.
     data.alias = alias;
     data.position = position;
     data.vendor_id = vendor_id;
     data.product_code = product_code;
 
+    // #define EC_IOCTL_CREATE_SLAVE_CONFIG  EC_IOWR(0x20, ec_ioctl_config_t)
+    // #define EC_IOWR(nr, type) _IOWR(EC_IOCTL_TYPE, nr, type)
+    // #define EC_IOCTL_TYPE 0xa4
+    // ret = ioctl(master->fd, _IOWR(0xa4, 0x20, ec_ioctl_config_t), &data);
+    // _IOWR用于创建设备上读写数据的命令。
     ret = ioctl(master->fd, EC_IOCTL_CREATE_SLAVE_CONFIG, &data);
-    if (EC_IOCTL_IS_ERROR(ret)) {
+
+    // 检查 ioctl 是否成功, 若 ret 错误,进if()
+    if (EC_IOCTL_IS_ERROR(ret))
+    {
+        // 向 stderr 打印错误信息和错误码
         fprintf(stderr, "Failed to create slave config: %s\n",
                 strerror(EC_IOCTL_ERRNO(ret)));
+        // 释放分配给 slave configuration 内存空间
         free(sc);
         return 0;
     }
 
+    // 初始化 slave configuration
     sc->next = NULL;
     sc->master = master;
-    sc->index = data.config_index;
+    sc->index = data.config_index; //保存 slave configuration 的索引号
     sc->alias = alias;
     sc->position = position;
     sc->first_sdo_request = NULL;
     sc->first_reg_request = NULL;
     sc->first_voe_handler = NULL;
 
+    // 将 slave configuration 添加到 master.
     ec_master_add_slave_config(master, sc);
 
     return sc;
@@ -248,16 +272,26 @@ int ecrt_master_select_reference_clock(ec_master_t *master,
 {
     uint32_t config_index;
     int ret;
-
-    if (sc) {
-        config_index = sc->index;
+    // 如果有要提供参考始终的 slave configuration
+    if (sc)
+    {
+        config_index = sc->index; // 保存提供参考时钟的
+                                  //  slave configuration的索引号
     }
     else {
         config_index = 0xFFFFFFFF;
     }
 
+    // #define EC_IOCTL_SELECT_REF_CLOCK  EC_IOW(0x21, uint32_t)
+    // #define EC_IOW(nr, type) _IOW(EC_IOCTL_TYPE, nr, type)
+    // #define EC_IOCTL_TYPE  0xa4
+    // ret = ioctl(master->fd, _IOW(0xa4, 0x21, uint32_t), config_index);
     ret = ioctl(master->fd, EC_IOCTL_SELECT_REF_CLOCK, config_index);
-    if (EC_IOCTL_IS_ERROR(ret)) {
+
+    // 检查 ioctl 是否成功, 若 ret 错误,进if()
+    if (EC_IOCTL_IS_ERROR(ret))
+    {
+        // 向 stderr 打印错误信息和错误码
         fprintf(stderr, "Failed to select reference clock: %s\n",
                 strerror(EC_IOCTL_ERRNO(ret)));
         return -EC_IOCTL_ERRNO(ret);
