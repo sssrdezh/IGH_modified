@@ -321,17 +321,17 @@ typedef struct  {
 
 /*****************************************************************************/
 
-/** Master information.
+/** 主站信息.
  *
- * This is used as an output parameter of ecrt_master().
+ * 这个结构体作为 ecrt_master() 的一个输出参数.
  *
- * \see ecrt_master().
+ * \见 ecrt_master().
  */
 typedef struct {
-   unsigned int slave_count; /**< Number of slaves in the bus. */
-   unsigned int link_up : 1; /**< \a true, if the network link is up. */
-   uint8_t scan_busy; /**< \a true, while the master is scanning the bus */
-   uint64_t app_time; /**< Application time. */
+   unsigned int slave_count; /**< 总线上 slave 的数量. */
+   unsigned int link_up : 1; /**< 如果网络连接是连通状态,则为真. */
+   uint8_t scan_busy; /**< 如果master正在扫描总线,则为真. */
+   uint64_t app_time; /**< 应用程序时间. */
 } ec_master_info_t;
 
 /*****************************************************************************/
@@ -698,23 +698,21 @@ ec_slave_config_t *ecrt_master_slave_config(
  */
 int ecrt_master_select_reference_clock(
         ec_master_t *master, /**< EtherCAT master. */
-        ec_slave_config_t *sc /**< Slave config of the slave to use as the
-                               * reference slave (or NULL). */
+        ec_slave_config_t *sc /**< 要作为 reference slave 的 slave 的
+                              slave config(或 NULL). */
         );
 
-/** Obtains master information.
+/** 获得 master 的信息.
  *
- * No memory is allocated on the heap in
- * this function.
+ * 本函数不会在堆上分配内存空间.
  *
- * \attention The pointer to this structure must point to a valid variable.
+ * \注意 结构体指针必须指向一个有效的变量.
  *
- * \return 0 in case of success, else < 0
+ * \返回 0 表示成功,否则返回值 < 0
  */
 int ecrt_master(
         ec_master_t *master, /**< EtherCAT master */
-        ec_master_info_t *master_info /**< Structure that will output the
-                                        information */
+        ec_master_info_t *master_info /**< 输出信息的结构体. */
         );
 
 /** Obtains slave information.
